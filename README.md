@@ -8,3 +8,6 @@ mkdir build && cd build
 cmake ..
 make
 ```
+
+- [x] V2
+- [ ] V3
