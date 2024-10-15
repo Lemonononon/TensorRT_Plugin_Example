@@ -1,18 +1,25 @@
-cmake_minimum_required(VERSION 3.10)
-
-project(LayerNormPlugin)
+cmake_minimum_required(VERSION 3.16)
+project(PluginTest)
 
 set(CMAKE_CXX_STANDARD 17)
 
-find_package(CUDA REQUIRED)
 
-include_directories(${CUDA_INCLUDE_DIRS})
+add_definitions(-std=c++17)
+add_definitions(-DAPI_EXPORTS)
+option(CUDA_USE_STATIC_CUDA_RUNTIME OFF)
+set(CMAKE_BUILD_TYPE Debug)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CUDA_NVCC_FLAGS}")
+SET(CMAKE_BUILD_TYPE Debug)
+SET(CMAKE_CXX_FLAGS_DEBUG "$ENV{CXXFLAGS} -O0 -Wall -g -ggdb")
+SET(CMAKE_CXX_FLAGS_RELEASE "$ENV{CXXFLAGS} -O3 -Wall")
 
-add_library(LayerNormPlugin SHARED LayerNorm.cu LayerNormPlugin.h LayerNormPlugin.cpp)
 
-target_link_libraries(LayerNormPlugin ${CUDA_LIBRARIES})
+INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/include)
+
+# cuda
+FIND_PACKAGE(CUDA REQUIRED)
+include_directories(/usr/local/cuda/include)
+link_directories(/usr/local/cuda/lib64)
 
 # <------------------------TensorRT Related------------------------->
 #find_package(TensorRT REQUIRED)
@@ -20,9 +27,7 @@ target_link_libraries(LayerNormPlugin ${CUDA_LIBRARIES})
 include_directories(/home/xiaoying/code/dep/TensorRT-8.6.1.6/include)
 link_directories(/home/xiaoying/code/dep/TensorRT-8.6.1.6/lib)
 
-add_executable(test main.cpp)
-set_target_properties(test PROPERTIES CUDA_ARCHITECTURES "86")
-target_link_libraries(test LayerNormPlugin)
-target_link_libraries(test nvinfer)
-target_link_libraries(test nvinfer_plugin)
-target_link_libraries(test cudart)
+
+
+add_subdirectory(v2 ${CMAKE_BINARY_DIR}/v2)
+add_subdirectory(v3 ${CMAKE_BINARY_DIR}/v3)
